@@ -1,176 +1,393 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hy">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Table</title>
-<!--     <style>
+    <title>Հարսանեկան Տոմս</title>
+    <style>
         body {
-            font-family: 'Georgia', serif;
-            background-color: #fdf0e4;
-            color: #4d2c3d;
-            text-align: center;
-            padding: 50px;
-            position: relative;
-        }
-
-        .container {
-            background-color: #fff;
-            padding: 40px;
-            max-width: 500px;
-            margin: 0 auto;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            position: relative;
-            z-index: 2;
-        }
-
-        input[type="text"] {
-            border: 2px solid #e0c1b3;
-            padding: 10px;
-            width: 300px;
-            font-size: 1em;
-            border-radius: 5px;
-        }
-
-        button {
-            background-color: #737373;
-            border: none;
-            color: white;
-            padding: 12px 25px;
-            text-align: center;
-            font-size: 1.2em;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #c84d6d;
-        }
-
-        #ticket {
-            display: none;
-            width: 100%;
-            max-width: 700px;
-            position: absolute;
-            top: 120%;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1;
-            opacity: 0.8;
-        }
-
-        #notfound {
-            display: none;
-            color: red;
-            font-size: 14px;
-        }
-
-    </style> -->
-
-
-     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f9;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f7f7f7;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 38px;
+            color: #333;
+            font-family: 'Dancing Script', cursive;
+            margin-bottom: 30px;
         }
 
         .container {
             text-align: center;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+            width: 90%; 
+            max-width: 600px; 
         }
 
-        h1 {
-            font-size: 24px;
-            color: #333;
+        .form-group {
+            margin-bottom: 20px;
         }
 
-        p {
+        label {
             font-size: 18px;
             color: #555;
+            display: block;
+            margin-bottom: 8px;
         }
 
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 20px;
-            }
-
-            p {
-                font-size: 16px;
-            }
+        input[type="text"] {
+            padding: 12px;
+            width: 100%;
+            border: 2px solid #bbb;
+            border-radius: 10px;
+            font-size: 16px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
         }
 
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 18px;
-            }
-
-            p {
-                font-size: 14px;
-            }
+        button {
+            padding: 12px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            background-color: #ff5757;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
         }
+
+        button:hover {
+            background-color: #ff7979;
+        }
+
+        canvas {
+            margin-top: 20px; 
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%; 
+            height: auto; 
+        }
+
     </style>
 </head>
 <body>
-   <!--  <div class="container">
-        <p>Գրիր քո մուտքանունը</p>
-        <input type="text" id="userinput" placeholder="Մուտքանուն">
-        <br><br>
-        <button onclick="showTicket()">Հաստատել</button>
-        <p id="notfound"></p>
+    <div class="container">
+        <h1>Հարսանեկան Տոմս</h1>
+        <div class="form-group">
+            <label for="name">Անուն Ազգանուն</label>
+            <input type="text" id="name" placeholder="Պողոս Պողոսյան">
+            <p id="warning"  style="font-size: 12px; color: red;">Մուտքագրեք անուն–ազգանունը՝ ինչպես նշված է մուտքագրման դաշտում(հայատառ կամ լատինատառ)</p>
+        </div>
+        <button id="generateTicket">Որոնել</button>
+                    <p id="notFound"  style="font-size: 12px; color: red;"></p>
+
+        <canvas id="ticketCanvas" width="600" height="300"></canvas>
     </div>
 
-    <img src="" id="ticket">
-
     <script>
-        let users = [
-            {
-                username: "ArmineH972610",
-                name: "Արմինե",
-                sname: "Հայրապետյան",
-                table: 13,
-                count: 3
+        class Guest {
+            constructor(name, tableNumber, guestCount) {
+                this.name = name;
+                this.tableNumber = tableNumber;
+                this.guestCount = guestCount;
             }
-        ];
-    
-        function showTicket() {
-            let inputUserName = document.getElementById('userinput').value;
-            let found = false;
-    
-            for (let i = 0; i < users.length; i++) {
-                if (users[i].username === inputUserName) {
-                    document.getElementById('ticket').src = "ticket.jpg";
-                    document.getElementById('ticket').style.display = "block";
-                    document.getElementById('notfound').style.display = "none";
-                    found = true;
-                    break;
-                }
-            }
-    
-            if (!found) {
-                document.getElementById('notfound').innerHTML = "Ձեր տվյալները չեն գտնվել, խնդրում ենք կրկին փորձել:";
-                document.getElementById('notfound').style.display = "block";
-                document.getElementById('ticket').style.display = "none";
+
+            generateTicket() {
+                const canvas = document.getElementById('ticketCanvas');
+                const ctx = canvas.getContext('2d');
+                const image = new Image();
+                image.src = 'ticket.jpg'; 
+
+                image.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+                    // Տեղադրում ենք տվյալները՝ ըստ պահանջների
+                    ctx.font = "bold 15px Arial"
+                    ctx.fillStyle = "#8c0042";
+                    ctx.fillText(`${this.name}`, 220, 240);
+                    ctx.font = "60px Arial";
+                    ctx.fillStyle = "#ff1717";
+                    ctx.fillText(this.tableNumber, 495, 200);
+
+                    ctx.save();
+                    ctx.translate(500, 220);
+                    ctx.font = "20px arial";
+                    ctx.fillStyle = "#ffa600";
+                    ctx.rotate(-Math.PI / 2); 
+                    ctx.fillText(`Հյուրերի քանակ: ${this.guestCount}`, 0, 90);
+                    ctx.restore();
+
+                    ctx.font = "14px Arial";
+                    ctx.fillStyle = "#8a0606";
+                    const randomTicketNumber = Math.floor(100000 + Math.random() * 900000);
+                    ctx.fillText(`Տոմս №${randomTicketNumber}`, 470, 295);
+                };
+
+                canvas.classList.remove('hidden');
             }
         }
-    </script> -->
+
+    const guestList = [
+
+        //1
+    new Guest("Վերգինե Հայրապետյան", 1, 2),
+    new Guest("Էլեն Աբրահամյան", 1, 3),
+     new Guest("Սուրեն Հայրապետյան", 1, 2),
+    new Guest("Սարգիս Սիմոնյան", 1, 2),
+
+//2
+    new Guest("Հերմինե Դավթյան", 2, 2),
+    new Guest("Սասուն Վարդանյան", 2, 3),
+    new Guest("Արամ և Ալվինա", 2, 2),
+    new Guest("Հուսիկ Սեդրակյան", 2, 3),
+    new Guest("Սիմոն", 2, 2),
+
+//3
+
+    new Guest("Շահեն Հայրապետյան", 3, 2),
+    new Guest("Կարեն Խաչատրյան", 3, 2),
+    new Guest("Արտյոմ Հայրապետյան", 3, 2),
+    new Guest("Արտուշ Հայրապետյան", 3, 2),
+    new Guest("Հրաչ Հայրապետյան", 3, 2),
+    new Guest("Արմինե Հայրապետյան", 3, 1),
+    new Guest("Արմեն Հայրապետյան", 3, 1),
 
 
-    <div class="container">
-    <h1>Ուշադրությու՜ն․</h1>
-    <p>Սեղանների վերաբերյալ տվյալները հասանելի կլինեն հոկտեմբերի 20-ից։</p>
-</div>
+    //4
 
+
+    new Guest("Զավեն Վարդանյան", 4, 2),
+    new Guest("Արայիկ Կարապետյան", 4, 2),
+    new Guest("Անուշ Վարդանյան", 4, 2),
+    new Guest("Կամո Դավթյան", 4, 5),
+    new Guest("Հարութ` Էջմիածին", 4, 1),
+
+    //5
+
+     new Guest("Դավիթ Բոյաջյան", 5, 2),
+    new Guest("Մարիամ", 5, 1),
+    new Guest("Հասմիկ Ալեքսանյան", 5, 1),
+    new Guest("Լիլիթ", 5, 1),
+    new Guest("Գոհար", 5, 1),
+    new Guest("Սաթենիկ Հայրապետյան", 5, 2),
+    new Guest("Մարիաննա", 5, 2),
+    new Guest("Միլենա", 5, 1),
+    new Guest("Հոսո Բաղդասարյան", 5, 2),
+
+
+//6
+
+ new Guest("Արմեն ծովագյուղի", 6, 2),
+ new Guest("Զավեն Հակոբյան",6, 2),
+new Guest("Կարեն Հակոբյան", 6, 3),
+  new Guest("Էդուարդ և ընտանիք", 6, 2), 
+  new Guest("Գուրգեն և ընտանիք", 6, 2), 
+  new Guest("Դավիթ", 6, 1), 
+  new Guest("Արո՝ ընտանիք", 6, 2), 
+  new Guest("Խաչատուր", 6, 1), 
+
+
+    //7
+ new Guest("Նարեկ Սիմոնյան", 7, 5), 
+ new Guest("Նվեր Սարուխանյան", 7, 3),
+new Guest("Անդրանիկ Մկրյան", 7, 2), 
+new Guest("Հոսո գևորգյան", 7, 3),  
+new Guest("Սարգիս Հովակիմյան", 7, 2),
+
+
+//8
+
+   new Guest("Հարութ Աբովյան", 8, 2), 
+ new Guest("Էմիլ Աբրահամյան", 8, 2),
+new Guest("Մարկոս Հայրապետյան", 8, 3), 
+new Guest("Նորիկ Հայրապետյան", 8, 2),  
+new Guest("Իլվիտ Հայրապետյան", 8, 1),
+new Guest("Արթուր Դանիելյան", 8, 2),
+
+//9
+
+new Guest("Արսեն Ամրոյան",9, 5),
+new Guest("Կարինե Գալոյան",9, 2),
+new Guest("Կարեն Ամրոյան",9, 2),
+new Guest("Տիգրան Մելիքբեկյան",9, 2),
+new Guest("Սուրենի երեխաներ ",9, 2),
+
+//10
+
+new Guest("Գարիկ Ասատրյան",10, 4),
+new Guest("Սամվել Պետրոսյան",10, 2),
+new Guest("Գարիկ Մելքոնյան",10, 2),
+new Guest("Գևորգ Գևորգյան",10, 2),
+new Guest("Վարդան Զաքարյան",10, 2),
+
+//11
+
+new Guest("Մուխսյան ընտանիք",11, 8),
+new Guest("Գարիկ Եղիազարյան",11, 2),
+new Guest("Դերո Աբոյան",11, 2),
+
+
+//12
+new Guest("Հենո և ընտանիք",12, 2),
+new Guest("Վարդան Քարամյան",12, 2),
+new Guest("Վրեժ",12, 1),
+new Guest("Արթուր Գևորգյան",12, 2),
+new Guest("Հայկ Գալստյան",12, 2),
+new Guest("Տիգրան Դավթյան",12, 1),
+new Guest("Մարտին",12, 1),
+new Guest("Աբուլ",12, 1),
+new Guest("Վահրամ",12, 1),
+
+//26
+new Guest("Ռուզան Պողոսյան",26, 6),
+new Guest("Նարեկ Հարությունյան",26, 6),
+new Guest("Աբո Գրիգորյան",26, 3),
+new Guest("Զարզանդ Գրիգորյան",26, 3),
+new Guest("Կարո Գրիգորյան",26, 2),
+
+
+
+
+
+
+
+];
+
+// Անունների քարտեզ
+const nameMap = {
+    //1
+    "elen abrahamyan": "Էլեն Աբրահամյան",
+    "vergine hayrapetyan": "Վերգինե Հայրապետյան",
+    "suren hayrapetyan": "Սուրեն Հայրապետյան",
+    "sargis simonyan": "Սարգիս Սիմոնյան",
+    "simon": "Սիմոն",
+
+    //2
+    "hermine davtyan": "Հերմինե Դավթյան",
+    "sasun vardanyan": "Սասուն Վարդանյան",
+    "aram ev alvina": "Արամ և Ալվինա",
+    "husik sedrakyan": "Հուսիկ Սեդրակյան",
+
+    //3
+    "shahen hayrapetyan": "Շահեն Հայրապետյան",
+    "karen khachatryan": "Կարեն Խաչատրյան",
+    "artyom hayrapetyan": "Արտյոմ Հայրապետյան",
+    "artush hayrapetyan": "Արտուշ Հայրապետյան",
+    "hrach hayrapetyan": "Հրաչ Հայրապետյան",
+    "armine hayrapetyan": "Արմինե Հայրապետյան",
+    "armen hayrapetyan": "Արմեն Հայրապետյան",
+
+    //4
+    "zaven vardanyan": "Զավեն Վարդանյան",
+    "arayik karapetyan": "Արայիկ Կարապետյան",
+    "anush vardanyan": "Անուշ Վարդանյան",
+    "kamo davtyan": "Կամո Դավթյան",
+    "harut ejmiatsin": "Հարութ Էջմիածին",
+
+    //5
+    "davit boyajyan": "Դավիթ Բոյաջյան",
+    "mariam": "Մարիամ",
+    "hasmik alexanyan": "Հասմիկ Ալեքսանյան",
+    "lilit": "Լիլիթ",
+    "gohar": "Գոհար",
+    "satenik hayrapetyan": "Սաթենիկ Հայրապետյան",
+    "marianna": "Մարիաննա",
+    "milena": "Միլենա",
+    "hoso baghdasaryan": "Հոսո Բաղդասարյան",
+
+    //6
+    "armen tsovagyuxi": "Արմեն ծովագյուղի",
+    "zaven hakobyan": "Զավեն Հակոբյան",
+    "karen hakobyan": "Կարեն Հակոբյան",
+    "eduard": "Էդուարդ",
+    "gurgen": "Գուրգեն",
+    "davit": "Դավիթ",
+    "aro ev entanik": "Արո՝ ընտանիք",
+    "khachatur": "Խաչատուր",
+
+    //7
+    "narek simonyan": "Նարեկ Սիմոնյան",
+    "nver saruxanyan": "Նվեր Սարուխանյան",
+    "andranik mkryan": "Անդրանիկ Մկրյան",
+    "hoso gevorgyan": "Հոսո Գևորգյան",
+    "sargis hovakimyan": "Սարգիս Հովակիմյան",
+
+    //8
+    "harut abovyan": "Հարութ Աբովյան",
+    "emil abrahamyan": "Էմիլ Աբրահամյան",
+    "markos hayrapetyan": "Մարկոս Հայրապետյան",
+    "norik hayrapetyan": "Նորիկ Հայրապետյան",
+    "ilvit hayrapetyan": "Իլվիտ Հայրապետյան",
+    "artur danielyan": "Արթուր Դանիելյան",
+
+    //9
+    "arsen amroyan": "Արսեն Ամրոյան",
+    "karine galoyan": "Կարինե Գալոյան",
+    "karen amroyan": "Կարեն Ամրոյան",
+    "tigran melikbekyan": "Տիգրան Մելիքբեկյան",
+    "suren erexaner": "Սուրենի երեխաներ",
+
+    //10
+    "garik asatryan": "Գարիկ Ասատրյան",
+    "samvel petrosyan": "Սամվել Պետրոսյան",
+    "garik melkonyan": "Գարիկ Մելքոնյան",
+    "gevorg gevorgyan": "Գևորգ Գևորգյան",
+    "vardan zakaryan": "Վարդան Զաքարյան",
+
+    //11
+    "muxsyan entanik": "Մուխսյան ընտանիք",
+    "garik yeghiazaryan": "Գարիկ Եղիազարյան",
+    "dero aboyan": "Դերո Աբոյան",
+
+    //12
+    "heno ev entanik": "Հենո և ընտանիք",
+    "vardan karamyan": "Վարդան Քարամյան",
+    "vrezh": "Վրեժ",
+    "artur gevorgyan": "Արթուր Գևորգյան",
+    "hayk galstyan": "Հայկ Գալստյան",
+    "tigran davtyan": "Տիգրան Դավթյան",
+    "martin": "Մարտին",
+    "abul": "Աբուլ",
+    "vahram": "Վահրամ",
+
+    //13
+    "ruzan poghosyan": "Ռուզան Պողոսյան",
+    "narek harutyunyan": "Նարեկ Հարությունյան",
+    "abo grigoryan": "Աբո Գրիգորյան",
+    "zarzand grigoryan": "Զարզանդ Գրիգորյան",
+    "karo grigoryan": "Կարո Գրիգորյան"
+};
+
+
+document.getElementById('generateTicket').addEventListener('click', function() {
+    const nameInput = document.getElementById('name').value.toLowerCase();
+    // Ստուգում ենք, թե արդյոք կա լատինատառ անուն
+    const name = nameMap[nameInput] || nameInput; 
     
+    // Գտնում ենք հյուրին: Եթե հայերեն անուն է մուտքագրված, պետք է ստուգենք
+    const guest = guestList.find(g => g.name.toLowerCase() === name.toLowerCase()); 
+
+    if (guest) {
+        guest.generateTicket();
+        document.getElementById("warning").textContent = "";
+        document.getElementById("notFound").textContent = "";
+    } else {
+        document.getElementById("warning").textContent = "Մուտքագրեք անուն–ազգանունը՝ ինչպես նշված է մուտքագրման դաշտում(հայատառ կամ լատինատառ)";
+        document.getElementById("notFound").textContent = "Հյուրի տվյալները չգտնվեցին";
+        document.getElementById("name").value = ""; // Նորացնել մուտքի դաշտը
+    }
+});
+
+
+    </script>
 </body>
 </html>
